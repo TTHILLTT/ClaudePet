@@ -3,12 +3,6 @@
 > EN: A terminal desktop companion featuring the authentic Claude logo.  
 > ZH: 一只跑在终端里的桌面宠物，使用 Claude 标志性的 logo。
 
-```
-        ▐▛███▜▌            ← EN: ▛ ▜ are the eyes
-       ▝▜█████▛▘           ← ZH: ▛ ▜ 就是她的眼睛
-         ▘▘ ▝▝             ←     眨眼: ▐▛███▜▌ → ▐█████▌
-```
-
 ---
 
 ## ✨ Features · 功能

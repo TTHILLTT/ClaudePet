@@ -1,105 +1,152 @@
-# 🐾 Claude Desktop Pet
+# 🐾 Claude Desktop Pet · Claude 桌面宠物
 
-A terminal-based desktop companion featuring Claude's iconic wave design. The pet wanders around, reacts to clicks and keyboard input, shows emotions, and keeps you company in your terminal.
+> EN: A terminal desktop companion featuring the authentic Anthropic Claude wave logo.  
+> ZH: 一只跑在终端里的桌面宠物，使用 Anthropic Claude 标志性的波浪 logo。
 
 ```
-  ╔══════════════╗
-  ║              ║
-  ║  ●        ●  ║      ← cute blinking eyes
-  ║       ◡      ║      ← expressive mouth
-  ║   ≈≈≈≈≈≈≈   ║      ← Claude wave motif (golden)
-  ╚══════════════╝
-   ♥  ♥  ♥  ♥  ♥        ← hearts when happy!
+          ▐▛███▜▌            ← EN: ▛ ▜ are the eyes
+         ▝▜█████▛▘           ← ZH: ▛ ▜ 就是她的眼睛
+           ▘▘ ▝▝             ←     眨眼: ▐▛███▜▌ → ▐█████▌
 ```
 
-## Features
+---
 
-- **Autonomous behaviors** — wanders, sleeps, waves, shows emotions
-- **Click / keyboard interaction** — pet the Claude blob, it reacts!
-- **Mood system** — idle → happy → surprised → sleeping → waving
-- **Speech bubbles** — the pet says random cute things
-- **Claude brand design** — warm orange + golden wave pattern
-- **Smooth animations** — frame-based with blinking and shimmer effects
+## ✨ Features · 功能
 
-## Installation
+| EN | ZH |
+|----|----|
+| Authentic Claude wave logo from `ClaudeModel.txt` | 真实的 Claude 波浪 logo，由 `ClaudeModel.txt` 定义 |
+| Natural blink — switches between two model files (2.8s open / 0.2s blink) | 自然眨眼 — 两个模型文件轮流播放（2.8s 睁眼 / 0.2s 闭眼） |
+| Click / Space to interact — triggers happy / surprised / waving | 点击 / 空格互动 — 触发开心 / 惊讶 / 挥手 |
+| Speech bubbles with random cute quotes | 随机台词说话气泡 |
+| Arrow keys move, q / Esc quits | 方向键移动，q / Esc 退出 |
+| Auto-center in terminal, adapts on resize | 自动居中，窗口缩放时自适应 |
+| Zero dependencies — pure Node.js + ANSI | 零依赖 — 纯 Node.js + ANSI |
 
-**Zero dependencies!** Just Node.js 16+ and a modern terminal.
+---
+
+## 📦 Installation · 安装
+
+**Zero dependencies! · 零依赖！** Node.js 16+ and a modern terminal / 一个现代终端即可。
 
 ```bash
 cd claude-pet
-# That's it — no npm install needed!
-```
-
-Requires a **modern terminal** with Unicode + ANSI support:
-- **Windows:** Windows Terminal (recommended), ConEmu, Cmder
-- **macOS:** iTerm2, Kitty, Alacritty, built-in Terminal.app
-- **Linux:** GNOME Terminal, Konsole, Kitty, Alacritty
-
-> ⚠️ The classic Windows `cmd.exe` may not render box-drawing characters correctly.
-> Use **Windows Terminal** instead — it's free on the Microsoft Store.
-
-## Usage
-
-```bash
-# Start the pet
-npm start
-
-# Or directly
 node index.js
 ```
 
-### Controls
+Requires a terminal with **Unicode + 24-bit colour** support · 需要支持 Unicode + 24 位真彩色的终端：
 
-| Input | Action |
-|-------|--------|
-| **Click** on pet | Pet it! (triggers happy/surprised/waving reaction) |
-| **Space** | Same as click — pet the blob |
-| **Arrow keys** | Guide the pet around the screen |
-| **q / Esc / Ctrl+C** | Quit |
+| OS | Recommended · 推荐 |
+|----|-------------------|
+| Windows | **Windows Terminal** (Microsoft Store) |
+| macOS | iTerm2, Kitty, Alacritty |
+| Linux | GNOME Terminal, Konsole, Kitty |
 
-### Moods
+> ⚠️  Classic `cmd.exe` may not render correctly. Use **Windows Terminal**.  
+> ⚠️  经典 `cmd.exe` 可能无法正确渲染，请使用 **Windows Terminal**。
 
-| Mood | Trigger | What it looks like |
-|------|---------|-------------------|
-| **Idle** | Default state | Gentle shimmer, occasional blinks |
-| **Happy** | Clicked, random joy | `^^` eyes, `▽` smile, floating hearts |
-| **Surprised** | Sudden interaction, waking up | `OO` wide eyes, `○` round mouth |
-| **Sleeping** | Ignored for too long | `‿‿` closed eyes, `zZZ` floating |
-| **Waving** | Friendly interaction | `♥` hand wave greeting |
+---
 
-## Project Structure
+## 🎮 Controls · 操作
+
+| Input · 输入 | Action · 作用 |
+|-------------|--------------|
+| **Click** on pet · 点击宠物 | Pet it! · 撸它！(开心/惊讶/挥手) |
+| **Space** · 空格 | Same as click · 同上 |
+| **Arrow keys** · 方向键 | Move the pet · 移动宠物 |
+| **q / Esc / Ctrl+C** | Quit · 退出 |
+
+---
+
+## 😊 Moods · 表情
+
+| Mood · 状态 | Trigger · 触发 | Effect · 效果 |
+|------------|---------------|--------------|
+| **Idle** · 待机 | Default · 默认 | Blink cycle (2.8s open → 0.2s closed) · 眨眼循环 |
+| **Happy** · 开心 | Click / random · 点击/随机 | Hearts below · 下方冒爱心 ♥ |
+| **Surprised** · 惊讶 | Sudden click / wake · 突然点击/醒来 | Speech bubble · 说话气泡 |
+| **Sleeping** · 睡觉 | Ignored too long · 太久不理 | ZZZ below · 下方飘 ZZZ |
+| **Waving** · 挥手 | Click · 点击 | ♥ sparkle · ♥ 闪烁 |
+
+---
+
+## 📁 Files · 文件
 
 ```text
 claude-pet/
-├── package.json      # Node.js project config
-├── index.js          # Main application (~350 lines, zero deps)
-├── start.bat         # Windows launcher
-├── start.sh          # Unix launcher (supports --float for xterm)
-└── README.md         # This file
+├── index.js            # Main application · 主程序 (zero deps · 零依赖)
+├── package.json        # Node.js config
+├── start.bat           # Windows launcher · Windows 启动脚本
+├── start.sh            # Unix launcher · Unix 启动脚本
+└── README.md           # This file · 本文件
 ```
 
-## How It Works
+Plus two model files in the parent directory · 上级目录有两个模型文件：
 
-The pet is rendered using **pure ANSI escape codes** — no libraries, no dependencies. Unicode box-drawing characters (╔╗╚╝║═) form the character, and 24-bit ANSI colour codes apply Claude's brand palette directly to the terminal. Mouse and keyboard input are parsed from raw stdin.
+| File · 文件 | Role · 作用 |
+|------------|------------|
+| `../ClaudeModel.txt` | Eyes open · 睁眼 (2.8 s) |
+| `../ClaudeModel2.txt` | Eyes closed · 闭眼 (0.2 s) |
 
-Animation frames cycle at ~350 ms, while a separate behaviour timer triggers autonomous actions every ~4.8 seconds.
+Edit these `.txt` files to customise the pet's appearance · 修改这两个 `.txt` 即可自定义宠物外观。
 
-The **Claude wave pattern** (═══ / ≈≈≈) on the body is the character's distinctive feature — rendered in golden amber `#F5A623` while the rest of the body uses warm terracotta `#D97757`, matching Claude's brand identity.
+---
 
-## Troubleshooting
+## 🔧 How It Works · 原理
 
-**Pet looks like garbled characters (乱码)**
+**EN:** The pet uses **pure ANSI escape codes** — alternate screen buffer, 24-bit colours, cursor positioning, and SGR mouse tracking. All rendering is merged into a single `write()` per frame to avoid flicker. Keyboard and mouse input are parsed directly from raw stdin.
 
-Make sure you're using a modern terminal with Unicode support. On Windows, use **Windows Terminal** (free from the Microsoft Store) instead of the classic `cmd.exe`.
+**ZH:** 宠物使用**纯 ANSI 转义序列** — 交替屏幕缓冲区、24 位颜色、光标定位和 SGR 鼠标追踪。每帧所有渲染合并为一次 `write()` 以避免闪烁。键盘和鼠标输入从原始 stdin 直接解析。
 
-**"Terminal is too small" error**
+```
+┌──────────────────────────────────────────┐
+│  Terminal · 终端                          │
+│  ┌──────────────────────────────────┐    │
+│  │  Speech Bubble · 说话气泡          │    │
+│  │  ╭──────────────────╮            │    │
+│  │  │ Hello! 👋        │            │    │
+│  │  ╰──────────────────╯            │    │
+│  └──────────────────────────────────┘    │
+│         ▐▛███▜▌     ← Claude wave        │
+│        ▝▜█████▛▘                          │
+│          ▘▘ ▝▝                            │
+│                                           │
+│  Tick: 500ms · Behaviour: 4.8s            │
+│  Single write() per frame · 每帧一次写入    │
+└──────────────────────────────────────────┘
+```
 
-Resize your terminal to at least 18 columns × 8 rows before starting.
+---
 
-**No colours visible**
+## 🎨 Customisation · 自定义
 
-Your terminal must support 24-bit true colour. Most modern terminals do — if yours doesn't, try Windows Terminal, iTerm2, or Kitty.
+Edit `ClaudeModel.txt` and `ClaudeModel2.txt` in the parent directory to change the pet's shape. The files use Unicode block characters:
 
-## License
+```
+▐▛███▜▌     ← ▐▛ = left cap, ▛ = left eye, ▜ = right eye, ▜▌ = right cap
+▝▜█████▛▘   ← ▝▜ = left cap, ▛▘ = right cap
+▘▘ ▝▝       ← fragments
+```
 
-MIT — feel free to modify and share!
+Colours and timing can be adjusted at the top of `index.js`:
+- `CLR.orange` / `CLR.gold` — wave colour
+- `TICK_MS` — animation rate (default 500ms)
+- `BEHAVE_MS` — mood change interval (default 4.8s)
+- `SPEECH_MS` — bubble duration (default 3.2s)
+
+---
+
+## ❓ Troubleshooting · 故障排查
+
+| Problem · 问题 | Solution · 解决 |
+|---------------|----------------|
+| Garbled characters · 乱码 | Use Windows Terminal / iTerm2 / Kitty (not cmd.exe) |
+| Terminal too small · 终端太小 | Resize to ≥ 20 cols × 8 rows |
+| No colours · 无颜色 | Terminal must support 24-bit true colour |
+| Speech bubble misaligned · 气泡错位 | Ensure terminal supports full Unicode (UTF-8) |
+
+---
+
+## 📄 License · 许可
+
+MIT — feel free to modify and share! · 自由修改和分享！

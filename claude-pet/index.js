@@ -14,8 +14,9 @@
 
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
+const fs    = require('fs');
+const path  = require('path');
+const https = require('https');
 
 // ╔══════════════════════════════════════════════════════════════════════╗
 // ║  READ CLAUDE WAVE MODELS                                             ║
@@ -90,8 +91,9 @@ const CLR = {
 
 const TICK_MS    = 500;   // slower refresh = less flicker
 const BEHAVE_MS  = 4800;
-const SPEECH_MS  = 3200;
-const WANDER_SPD = 0.5;
+const SPEECH_MS    = 3200;
+const NEWS_INTERVAL = 10000;  // fetch AI news every 10 s
+const WANDER_SPD   = 0.5;
 // PET_W / PET_H are read dynamically from ClaudeModel.txt above
 
 // ── Things the pet says ──────────────────────────────────────────────
@@ -146,6 +148,7 @@ const S = {
   happiness:  50,
   animTmr:    null,
   behaveTmr:  null,
+  newsTmr:    null,
   speechText: '',
   speechUntil: 0,     // Date.now() deadline, 0 = inactive
   cols:       80,
@@ -214,24 +217,58 @@ function vwidth(s) {
   return w;
 }
 
+// Word-wrap text into lines ≤ maxW chars wide (visual)
+function wrapLines(text, maxW) {
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const trial = cur ? cur + ' ' + w : w;
+    if (vwidth(trial) <= maxW) { cur = trial; }
+    else { if (cur) lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+
 // Build speech bubble string + return its bounds (no write)
 function buildSpeechBubble(text, px, py) {
-  const maxW = PET_W + 6;
-  let display = text;
-  while (vwidth(display) > maxW - 2) display = display.slice(0, -1);
-  if (display !== text) display = display.slice(0, -3) + '...';
+  const isNews = text.startsWith('[HN]');
+  let innerW, lines;
 
-  const innerW = vwidth(display) + 2;
-  const w      = innerW + 2;
-  const bx     = clamp(px + Math.floor((PET_W - w) / 2), 0, S.cols - w);
-  const by     = clamp(py - 3, 0, S.rows - 1);
+  if (isNews) {
+    // Multi-line news bubble — wrap at 50 cols
+    const maxW = Math.min(S.cols - 6, 50);
+    lines = wrapLines(text, maxW);
+    innerW = Math.max(...lines.map(l => vwidth(l)));
+  } else {
+    // Single-line small bubble
+    const maxW = PET_W + 6;
+    let display = text;
+    while (vwidth(display) > maxW - 2) display = display.slice(0, -1);
+    if (display !== text) display = display.slice(0, -3) + '...';
+    lines = [display];
+    innerW = vwidth(display);
+  }
+
+  // Pad all lines to innerW and add side spaces
+  const padded = lines.map(l => l + ' '.repeat(Math.max(0, innerW - vwidth(l))));
+  const w  = innerW + 4;   // "│ " + text + " │"
+  const h  = lines.length + 2;  // + top/bottom borders
+  const bx = clamp(px + Math.floor((PET_W - w) / 2), 0, S.cols - w);
+  const by = clamp(py - h - 1, 0, S.rows - h);
 
   let out = CLR.gold;
-  out += cursorTo(by, bx)     + '╭' + '─'.repeat(innerW) + '╮';
-  out += cursorTo(by + 1, bx) + '│ ' + CLR.cream + display + CLR.gold + ' │';
-  out += cursorTo(by + 2, bx) + '╰' + '─'.repeat(innerW) + '╯';
+  // Top border
+  out += cursorTo(by, bx) + '╭' + '─'.repeat(innerW + 2) + '╮';
+  // Text lines
+  for (let i = 0; i < lines.length; i++) {
+    out += cursorTo(by + 1 + i, bx) + '│ ' + CLR.cream + padded[i] + CLR.gold + ' │';
+  }
+  // Bottom border
+  out += cursorTo(by + 1 + lines.length, bx) + '╰' + '─'.repeat(innerW + 2) + '╯';
   out += CLR.reset;
-  return { str: out, x: bx, y: by, w: w };
+  return { str: out, x: bx, y: by, w: w, h: h };
 }
 
 // Build erase string (no write)
@@ -248,7 +285,7 @@ function buildErase(x, y, w, h) {
 
 // Full redraw: erase old pet + old speech, draw new pet + active speech
 let _lastPetX = 0, _lastPetY = 0, _lastPetH = 0;
-let _lastSpX = 0, _lastSpY = 0, _lastSpW = 0;
+let _lastSpX = 0, _lastSpY = 0, _lastSpW = 0, _lastSpH = 3;
 let _hadSpeech = false;
 
 function redraw() {
@@ -257,7 +294,7 @@ function redraw() {
   // 1. Erase old areas
   buf += buildErase(_lastPetX, _lastPetY, PET_W, _lastPetH);
   if (_hadSpeech) {
-    buf += buildErase(_lastSpX, _lastSpY, _lastSpW, 3);
+    buf += buildErase(_lastSpX, _lastSpY, _lastSpW, _lastSpH);
   }
 
   // 2. Build pet string at current position
@@ -267,13 +304,13 @@ function redraw() {
   _lastPetY = S.pos.y;
   _lastPetH = rows.length;
 
-  // 3. Build speech bubble if active
+  // 3. Build speech bubble if active (variable height)
   _hadSpeech = !!S.speechText;
-  _lastSpX = 0; _lastSpY = 0; _lastSpW = 0;
+  _lastSpX = 0; _lastSpY = 0; _lastSpW = 0; _lastSpH = 3;
   if (S.speechText) {
     const sp = buildSpeechBubble(S.speechText, S.pos.x, S.pos.y);
     buf += sp.str;
-    _lastSpX = sp.x; _lastSpY = sp.y; _lastSpW = sp.w;
+    _lastSpX = sp.x; _lastSpY = sp.y; _lastSpW = sp.w; _lastSpH = sp.h;
   }
 
   // 4. Single write — no intermediate flicker
@@ -288,9 +325,43 @@ function redraw() {
 // ╚══════════════════════════════════════════════════════════════════════╝
 
 function say(text) {
+  // Don't overwrite active news bubble with a random quip
+  if (!text && S.speechText && S.speechText.startsWith('[HN]')) return;
   S.speechText  = text || pick(QUOTES);
-  S.speechUntil = Date.now() + SPEECH_MS;
+  const isNews = text && text.startsWith('[HN]');
+  S.speechUntil = Date.now() + (isNews ? 8000 : SPEECH_MS);
   redraw();
+}
+
+// ── Fetch AI news from Hacker News (zero-dependency) ─────────────────
+function fetchNews() {
+  const opts = { rejectUnauthorized: false };
+  https.get('https://hacker-news.firebaseio.com/v0/topstories.json', opts, (res) => {
+    if (res.statusCode !== 200) return;
+    let data = '';
+    res.on('data', c => data += c);
+    res.on('end', () => {
+      try {
+        const ids = JSON.parse(data);
+        if (!ids.length) return;
+        // Pick from the top 200 stories (pages 1–7 of HN front page)
+        const pool = ids.slice(0, 200);
+        const id   = pool[rand(pool.length)];
+        https.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, opts, (r2) => {
+          let d2 = '';
+          r2.on('data', c => d2 += c);
+          r2.on('end', () => {
+            try {
+              const story = JSON.parse(d2);
+              if (story && story.title) {
+                say('[HN] ' + story.title.slice(0, 100));
+              }
+            } catch (_) {}
+          });
+        }).on('error', () => {});
+      } catch (_) {}
+    });
+  }).on('error', () => {});
 }
 
 // ╔══════════════════════════════════════════════════════════════════════╗
@@ -524,6 +595,7 @@ process.stdout.on('resize', () => {
 function shutdown() {
   if (S.animTmr)   clearInterval(S.animTmr);
   if (S.behaveTmr) clearInterval(S.behaveTmr);
+  if (S.newsTmr)   clearInterval(S.newsTmr);
   if (_cycleTmr)   clearTimeout(_cycleTmr);
   process.stdout.write(cursorShow() + mouseOff() + altBufferOff() + CLR.reset);
   if (process.stdin.isTTY) process.stdin.setRawMode(false);
@@ -587,9 +659,11 @@ function start() {
   // Start loops
   S.animTmr   = setInterval(tick,   TICK_MS);
   S.behaveTmr = setInterval(behave, BEHAVE_MS);
+  S.newsTmr   = setInterval(fetchNews, NEWS_INTERVAL);
 
-  // Greet
+  // Greet, then fetch first news shortly after
   setTimeout(() => say('Hello! I\'m Claude!'), 600);
+  setTimeout(fetchNews, 1000);
 
   process.stdout.title = '🐾 Claude Pet';
 }

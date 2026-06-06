@@ -1,7 +1,7 @@
 # 🐾 Claude Desktop Pet · Claude 桌面宠物
 
-> EN: A terminal desktop companion featuring the authentic Anthropic Claude wave logo.  
-> ZH: 一只跑在终端里的桌面宠物，使用 Anthropic Claude 标志性的波浪 logo。
+> EN: A terminal desktop companion featuring the authentic Claude logo.  
+> ZH: 一只跑在终端里的桌面宠物，使用 Claude 标志性的 logo。
 
 ```
         ▐▛███▜▌            ← EN: ▛ ▜ are the eyes
@@ -15,7 +15,7 @@
 
 | EN | ZH |
 |----|----|
-| Authentic Claude wave logo from `ClaudeModel.txt` | 真实的 Claude 波浪 logo，由 `ClaudeModel.txt` 定义 |
+| Claude logo from `ClaudeModel.txt` | 真实的 Claude logo，由 `ClaudeModel.txt` 定义 |
 | Natural blink — two model files alternate (2.8s open / 0.2s blink) | 自然眨眼 — 两个模型文件轮流播放（2.8s 睁眼 / 0.2s 闭眼） |
 | **Live HN news** — fetches Hacker News headlines every 10s | **实时 HN 新闻** — 每 10 秒抓取 Hacker News 头条 |
 | **Click news bubble → opens article in browser** | **点击新闻气泡 → 浏览器打开原文** |
@@ -133,7 +133,7 @@ Edit these `.txt` files to customise the pet's appearance · 修改这两个 `.t
 │  │  │ creative work simultaneously   │  │    │
 │  │  ╰────────────────────────────────╯  │    │
 │  └──────────────────────────────────────┘    │
-│         ▐▛███▜▌     ← Claude wave            │
+│         ▐▛███▜▌     ← Claude                 │
 │        ▝▜█████▛▘                              │
 │          ▘▘ ▝▝                                │
 │                                               │

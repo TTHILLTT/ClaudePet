@@ -1,7 +1,7 @@
 # 🐾 Claude Desktop Pet · Claude 桌面宠物
 
-> EN: A terminal desktop companion featuring the authentic Anthropic Claude wave logo.  
-> ZH: 一只跑在终端里的桌面宠物，使用 Anthropic Claude 标志性的波浪 logo。
+> EN: A terminal desktop companion featuring the authentic Claude claw logo.  
+> ZH: 一只跑在终端里的桌面宠物，使用 Claude 标志性的螃蟹 logo。
 
 ```
           ▐▛███▜▌            ← EN: ▛ ▜ are the eyes
@@ -15,7 +15,7 @@
 
 | EN | ZH |
 |----|----|
-| Authentic Claude wave logo from `ClaudeModel.txt` | 真实的 Claude 波浪 logo，由 `ClaudeModel.txt` 定义 |
+| Authentic Claude claw logo from `ClaudeModel.txt` | 真实的 Claude 螃蟹 logo，由 `ClaudeModel.txt` 定义 |
 | Natural blink — switches between two model files (2.8s open / 0.2s blink) | 自然眨眼 — 两个模型文件轮流播放（2.8s 睁眼 / 0.2s 闭眼） |
 | Click / Space to interact — triggers happy / surprised / waving | 点击 / 空格互动 — 触发开心 / 惊讶 / 挥手 |
 | Speech bubbles with random cute quotes | 随机台词说话气泡 |
@@ -107,7 +107,7 @@ Edit these `.txt` files to customise the pet's appearance · 修改这两个 `.t
 │  │  │ Hello! 👋        │            │    │
 │  │  ╰──────────────────╯            │    │
 │  └──────────────────────────────────┘    │
-│         ▐▛███▜▌     ← Claude wave        │
+│         ▐▛███▜▌     ← Claude claw        │
 │        ▝▜█████▛▘                          │
 │          ▘▘ ▝▝                            │
 │                                           │
@@ -129,7 +129,7 @@ Edit `ClaudeModel.txt` and `ClaudeModel2.txt` in the parent directory to change 
 ```
 
 Colours and timing can be adjusted at the top of `index.js`:
-- `CLR.orange` / `CLR.gold` — wave colour
+- `CLR.orange` / `CLR.gold` — claw colour
 - `TICK_MS` — animation rate (default 500ms)
 - `BEHAVE_MS` — mood change interval (default 4.8s)
 - `SPEECH_MS` — bubble duration (default 3.2s)

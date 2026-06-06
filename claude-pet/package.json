@@ -1,0 +1,12 @@
+{
+  "name": "claude-pet",
+  "version": "1.0.0",
+  "description": "A terminal-based desktop pet featuring Claude's iconic wave design — zero dependencies, pure ANSI magic.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["claude", "desktop-pet", "terminal", "tui", "companion", "ansi"],
+  "license": "MIT",
+  "dependencies": {}
+}

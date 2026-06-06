@@ -17,6 +17,7 @@
 const fs    = require('fs');
 const path  = require('path');
 const https = require('https');
+const { exec } = require('child_process');
 
 // ╔══════════════════════════════════════════════════════════════════════╗
 // ║  READ CLAUDE WAVE MODELS                                             ║
@@ -168,7 +169,8 @@ const S = {
   behaveTmr:  null,
   newsTmr:    null,
   speechText: '',
-  speechUntil: 0,     // Date.now() deadline, 0 = inactive
+  speechUntil: 0,
+  newsUrl:     '',     // clickable HN story URL
   cols:       80,
   rows:       24,
 };
@@ -372,6 +374,7 @@ function fetchNews() {
             try {
               const story = JSON.parse(d2);
               if (story && story.title) {
+                S.newsUrl = story.url || `https://news.ycombinator.com/item?id=${story.id}`;
                 say('[HN] ' + story.title.slice(0, 100));
               }
             } catch (_) {}
@@ -506,12 +509,26 @@ function tick() {
 // ╚══════════════════════════════════════════════════════════════════════╝
 
 function isClickOnPet(col1, row1) {
-  // col1, row1 are 1-indexed terminal coords from SGR mouse report
-  const cx = col1 - 1;
-  const cy = row1 - 1;
+  const cx = col1 - 1, cy = row1 - 1;
   const rows = curFrameArr();
   return cx >= S.pos.x && cx < S.pos.x + PET_W &&
          cy >= S.pos.y && cy < S.pos.y + rows.length;
+}
+
+function isClickOnNewsBubble(col1, row1) {
+  if (!S.newsUrl || !S.speechText || !S.speechText.startsWith('[HN]')) return false;
+  const cx = col1 - 1, cy = row1 - 1;
+  return cx >= _lastSpX && cx < _lastSpX + _lastSpW &&
+         cy >= _lastSpY && cy < _lastSpY + _lastSpH;
+}
+
+function openUrl(url) {
+  const cmd = process.platform === 'win32'
+    ? `start "" "${url}"`
+    : process.platform === 'darwin'
+      ? `open "${url}"`
+      : `xdg-open "${url}"`;
+  exec(cmd, (err) => { if (err) { /* silent */ } });
 }
 
 let _inputBuf = '';
@@ -534,6 +551,8 @@ process.stdin.on('data', (chunk) => {
           // Left-click press (no modifiers, ignore motion bit 32)
           if (isClickOnPet(parseInt(col, 10), parseInt(row, 10))) {
             interact();
+          } else if (isClickOnNewsBubble(parseInt(col, 10), parseInt(row, 10))) {
+            openUrl(S.newsUrl);
           }
         }
       }

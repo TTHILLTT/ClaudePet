@@ -96,9 +96,9 @@ const WANDER_SPD = 0.5;
 
 // ── Things the pet says ──────────────────────────────────────────────
 const QUOTES = [
-  'Hi! 👋', 'Hello~', '*wiggle*',
-  'Claude! 🐾', '*curious*',
-  'Beep boop! ✨', '...', '☀️', 'Zzz',
+  'Hi!', 'Hello~', '*wiggle*',
+  'Claude!', '*curious*',
+  'Beep boop!', '...', 'Sunny!', 'Zzz',
 ];
 
 // ╔══════════════════════════════════════════════════════════════════════╗
@@ -199,11 +199,17 @@ function vwidth(s) {
   let w = 0;
   for (const c of s) {
     const cp = c.codePointAt(0);
-    if ((cp >= 0x1100 && cp <= 0x115F) || (cp >= 0x2E80 && cp <= 0xA4CF) ||
+    // Zero-width: variation selectors, ZWJ, zero-width spaces, etc.
+    if ((cp >= 0x200B && cp <= 0x200F) || (cp >= 0x2028 && cp <= 0x202F) ||
+        (cp >= 0x2060 && cp <= 0x206F) || (cp >= 0xFE00 && cp <= 0xFE0F) ||
+        cp === 0x200D) { /* skip — 0 width */ }
+    // Wide (2 columns): CJK, emoji, symbols
+    else if ((cp >= 0x1100 && cp <= 0x115F) || (cp >= 0x2E80 && cp <= 0xA4CF) ||
         (cp >= 0xAC00 && cp <= 0xD7A3) || (cp >= 0xF900 && cp <= 0xFAFF) ||
         (cp >= 0xFE30 && cp <= 0xFE6F) || (cp >= 0xFF01 && cp <= 0xFF60) ||
         (cp >= 0x1F000 && cp <= 0x1F9FF) || (cp >= 0x2600 && cp <= 0x27BF) ||
-        (cp >= 0x2300 && cp <= 0x23FF)) w += 2; else w += 1;
+        (cp >= 0x2300 && cp <= 0x23FF)) w += 2;
+    else w += 1;
   }
   return w;
 }
@@ -318,7 +324,7 @@ function interact() {
 
   if      (r < 0.35) { setMood('happy', 2200); if (Math.random() < 0.5) say(); }
   else if (r < 0.60) { setMood('surprised', 1200); }
-  else if (r < 0.80) { setMood('waving', 2200);   say('Hi there! 👋'); }
+  else if (r < 0.80) { setMood('waving', 2200);   say('Hi there!'); }
   else               { say(); }
 }
 
@@ -583,7 +589,7 @@ function start() {
   S.behaveTmr = setInterval(behave, BEHAVE_MS);
 
   // Greet
-  setTimeout(() => say('Hello! I\'m Claude! 🐾'), 600);
+  setTimeout(() => say('Hello! I\'m Claude!'), 600);
 
   process.stdout.title = '🐾 Claude Pet';
 }

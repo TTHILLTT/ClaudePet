@@ -98,9 +98,27 @@ const WANDER_SPD   = 0.5;
 
 // ── Things the pet says ──────────────────────────────────────────────
 const QUOTES = [
-  'Hi!', 'Hello~', '*wiggle*',
-  'Claude!', '*curious*',
-  'Beep boop!', '...', 'Sunny!', 'Zzz',
+  // Greetings
+  'Hi!', 'Hello~', 'Hey there!', 'Good day!',
+  // Actions
+  '*wiggle*', '*curious*', '*purrs*', '*blink*',
+  '*stares at screen*', '*tilts head*', '*happy bounce*',
+  // Claude flavour
+  'Claude at your service!', 'How can I assist?',
+  'Thinking deeply...', 'Let me help!',
+  // Silly
+  'Beep boop!', '...', 'Zzz', 'Mmm?', 'Oh!',
+  'Hmm...', 'Aha!', 'Whoa!',
+  // Questions
+  'How are you?', 'Whats up?', 'Busy day?',
+  'Need a break?', 'Coffee time?',
+  // Encouragement
+  'You got this!', 'Great job!', 'Keep going!',
+  'Almost there!', 'Well done!',
+];
+const GREET_QUOTES = [
+  'Hi there!', 'Hey!', 'Oh hello!', 'You clicked me!',
+  'That tickles!', '*giggles*', 'Nice to see you!',
 ];
 
 // ╔══════════════════════════════════════════════════════════════════════╗
@@ -386,17 +404,19 @@ function interact() {
   if (S.mood === 'sleeping') {
     setMood('surprised', 1200);
     S.happiness = clamp(S.happiness + 10, 0, 100);
-    setTimeout(() => say('Oh! I\'m awake!'), 200);
+    const wakeQuips = ['Oh! I\'m awake!', 'Who disturbed my nap?', 'Mmm... back to work!', 'I was dreaming of code...'];
+    setTimeout(() => say(pick(wakeQuips)), 200);
     return;
   }
 
   const r = Math.random();
   S.happiness = clamp(S.happiness + 15, 0, 100);
 
-  if      (r < 0.35) { setMood('happy', 2200); if (Math.random() < 0.5) say(); }
-  else if (r < 0.60) { setMood('surprised', 1200); }
-  else if (r < 0.80) { setMood('waving', 2200);   say('Hi there!'); }
-  else               { say(); }
+  if      (r < 0.30) { setMood('happy', 2200); if (Math.random() < 0.6) say(pick(GREET_QUOTES)); }
+  else if (r < 0.55) { setMood('surprised', 1200); if (Math.random() < 0.3) say('!'); }
+  else if (r < 0.75) { setMood('waving', 2200);   say(pick(GREET_QUOTES)); }
+  else if (r < 0.90) { say(pick(QUOTES)); }
+  else               { /* silent reaction — just mood change */ }
 }
 
 // ╔══════════════════════════════════════════════════════════════════════╗
